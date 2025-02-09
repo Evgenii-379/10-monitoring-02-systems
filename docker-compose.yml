@@ -1,0 +1,85 @@
+services:
+  influxdb:
+    build:
+      context: ./images/influxdb/
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        INFLUXDB_TAG: ${INFLUXDB_TAG}
+    image: "influxdb"
+    volumes:
+      - ./influxdb/data:/var/lib/influxdb
+      - ./influxdb/config/:/etc/influxdb/
+    ports:
+      - "8086:8086"
+      - "8082:8082"
+      - "8089:8089/udp"
+ 
+  telegraf:
+    build:
+      context: ./images/telegraf/
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        TELEGRAF_TAG: ${TELEGRAF_TAG}
+    image: "telegraf"
+#    restart: always
+    environment:
+      HOSTNAME: "telegraf-getting-started"
+    links:
+      - influxdb
+    volumes:
+      - ./telegraf/:/etc/telegraf/
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - influxdb
+ 
+  kapacitor:
+    build:
+      context: ./images/kapacitor/
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        KAPACITOR_TAG: ${KAPACITOR_TAG}
+    image: "kapacitor"
+    environment:
+      KAPACITOR_HTTP_AUTH_ENABLED: "true"
+      KAPACITOR_AUTH_ENABLED: "true"
+    volumes:
+      - ./kapacitor/data/:/var/lib/kapacitor
+      - ./kapacitor/config/:/etc/kapacitor/
+    links:
+      - influxdb
+    ports:
+      - "9092:9092"
+ 
+ 
+  chronograf:
+    build:
+      context: ./images/chronograf
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        CHRONOGRAF_TAG: ${CHRONOGRAF_TAG}
+    image: "chronograf"
+    environment:
+      RESOURCES_PATH: "/usr/share/chronograf/resources"
+      INFLUXDB_URL: "http://influxdb:8086"  # Добавлено
+      INFLUXDB_USERNAME: "admin"
+      INFLUXDB_PASSWORD: "admin123"
+    volumes:
+      - ./chronograf/data/:/var/lib/chronograf/
+    links:
+      # Chronograf requires network access to InfluxDB and Kapacitor
+      - influxdb
+      - kapacitor
+    user: "1000:1000"
+    ports:
+      - "8888:8888"
+ 
+    depends_on:
+      - kapacitor
+      - influxdb
+      - telegraf
+ 
+  documentation:
+    build:
+      context: ./documentation
+    ports:
+      - "3010:3000"
