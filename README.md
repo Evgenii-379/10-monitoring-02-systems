@@ -212,29 +212,32 @@ Push модель:
 9. 
 - Изменил секцию telegraf в docker-compose.yml:
 
+``` 
   telegraf:
--    build:
--      context: ./images/telegraf/
--      dockerfile: ./${TYPE}/Dockerfile
--      args:
--        TELEGRAF_TAG: ${TELEGRAF_TAG}
--    image: "telegraf"
--    privileged: true
--    environment:
--      HOSTNAME: "telegraf-getting-started"
--    links:
--      - influxdb
--    ports:
--      - "8092:8092/udp"
--      - "8094:8094"
--      - "8125:8125/udp"
--    volumes:
--      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:Z
--      - /var/run/docker.sock:/var/run/docker.sock:Z
--    depends_on:
--      - influxdb 
+    build:
+      context: ./images/telegraf/
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        TELEGRAF_TAG: ${TELEGRAF_TAG}
+    image: "telegraf"
+    privileged: true
+    environment:
+      HOSTNAME: "telegraf-getting-started"
+    links:
+      - influxdb
+    ports:
+      - "8092:8092/udp"
+      - "8094:8094"
+      - "8125:8125/udp"
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:Z
+      - /var/run/docker.sock:/var/run/docker.sock:Z
+    depends_on:
+      - influxdb
+``` 
 
 - ![scrin](https://github.com/Evgenii-379/10-monitoring-02-systems/blob/main/Снимок%20экрана%202025-02-11%20213050.png)
 - ![scrin](https://github.com/Evgenii-379/10-monitoring-02-systems/blob/main/Снимок%20экрана%202025-02-11%20213226.png)
+
 
 
