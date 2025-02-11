@@ -234,7 +234,18 @@ Push модель:
       - /var/run/docker.sock:/var/run/docker.sock:Z
     depends_on:
       - influxdb
-``` 
+```
+- telegraf.conf
+
+```
+[[inputs.docker]]
+  endpoint = "unix:///var/run/docker.sock"
+  container_names = []
+  timeout = "5s"
+  perdevice = true
+  total = false
+
+```
 
 - ![scrin](https://github.com/Evgenii-379/10-monitoring-02-systems/blob/main/Снимок%20экрана%202025-02-11%20213050.png)
 - ![scrin](https://github.com/Evgenii-379/10-monitoring-02-systems/blob/main/Снимок%20экрана%202025-02-11%20213226.png)
